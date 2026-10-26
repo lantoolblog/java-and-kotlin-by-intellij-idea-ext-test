@@ -1,11 +1,12 @@
 {
   "intellij.projects": [
     {
-      "type": "gradle",
+      "type": "maven",
       "path": "file:///$PROJECT_DIR$",
-      "downloadAdditionalArtifacts": true      
+      "java-home": "C:\\JDK\\21",
     }
   ],
+  "intellij.jdkForSymbolResolution": "C:/JDK/21",
   "maven.terminal.favorites": [
     {
       "command": "clean test"
