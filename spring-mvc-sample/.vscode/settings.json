@@ -1,0 +1,20 @@
+{
+  "intellij.projects": [
+    {
+      "type": "gradle",
+      "path": "file:///$PROJECT_DIR$",
+      "downloadAdditionalArtifacts": true      
+    }
+  ],
+  "maven.terminal.favorites": [
+    {
+      "command": "clean test"
+    },
+    {
+      "command": "-DskipTests clean package"
+    },
+    {
+      "command": "-DskipTests clean prepare-package war:exploded"
+    }
+  ]
+}

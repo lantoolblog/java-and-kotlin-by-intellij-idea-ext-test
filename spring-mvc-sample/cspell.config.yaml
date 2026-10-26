@@ -1,0 +1,32 @@
+version: "0.2"
+ignorePaths:
+  - gradlew
+  - gradlew.bat
+  - mvnw
+  - mvnw.cmd
+dictionaryDefinitions: []
+dictionaries: []
+words:
+  - aspectj
+  - aspectjrt
+  - codehaus
+  - Dcargo
+  - Dskip
+  - ENDLOCAL
+  - findstr
+  - foojay
+  - freefair
+  - gradlew
+  - jquery
+  - lantoolblog
+  - logback
+  - mkdirs
+  - projectlombok
+  - SETLOCAL
+  - ultraq
+  - webapps
+  - webjars
+  - webmvc
+  - Xlint
+ignoreWords: []
+import: []

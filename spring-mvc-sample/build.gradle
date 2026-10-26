@@ -1,0 +1,129 @@
+plugins {
+  id 'java'
+  alias(libs.plugins.lombok)
+  id 'war'
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of("${javaVersion}")
+  }
+}
+
+[compileJava, compileTestJava]*.options*.encoding = "${projectEncoding}"
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation (libs.spring.context)
+  implementation (libs.spring.webmvc)
+
+  implementation (libs.aspectjrt)
+
+  implementation (libs.slf4j.api)
+  implementation (libs.logback.classic)
+
+  implementation (libs.jakarta.inject.api)
+  compileOnly (libs.jakarta.servlet.api)
+
+  implementation (libs.thymeleaf.spring6)
+  implementation (libs.thymeleaf.layout.dialect)
+
+  implementation (libs.webjars.locator.core)
+  implementation (libs.webjars.jquery)
+  implementation (libs.webjars.bootstrap)
+
+  testImplementation (libs.jakarta.servlet.api)
+  testImplementation (libs.junit.jupiter)
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+  testImplementation (libs.assertj.core)
+  testImplementation (libs.hamcrest)
+  testImplementation (libs.mockito.core)
+  testImplementation (libs.mockito.junit.jupiter)
+  testImplementation (libs.spring.test)
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+
+  jvmArgs '-XX:+EnableDynamicAgentLoading', '-Xshare:off'
+
+  testLogging {
+    outputs.upToDateWhen { false }
+    showStandardStreams = true
+  }
+}
+
+def tomcatVersion = providers.gradleProperty('tomcat10Version').get()
+def tomcatZipUrl = "https://repo.maven.apache.org/maven2/org/apache/tomcat/tomcat/${tomcatVersion}/tomcat-${tomcatVersion}.zip"
+def tomcatZip = layout.buildDirectory.file("tomcat/apache-tomcat-${tomcatVersion}.zip")
+def tomcatHomeDir = layout.buildDirectory.dir("tomcat-dist/apache-tomcat-${tomcatVersion}")
+
+tasks.register('downloadTomcat') {
+  group = 'application'
+  description = "Downloads Apache Tomcat ${tomcatVersion}."
+  inputs.property('tomcatVersion', tomcatVersion)
+  outputs.file(tomcatZip)
+
+  doLast {
+    def archive = tomcatZip.get().asFile
+    archive.parentFile.mkdirs()
+    // 변경 (Java 20+ 권장 방식)
+    URI.create(tomcatZipUrl).toURL().withInputStream { input ->
+      archive.withOutputStream { output ->
+        output << input
+      }
+    }
+  }
+}
+
+tasks.register('extractTomcat', Copy) {
+  group = 'application'
+  description = 'Extracts Apache Tomcat into the build directory.'
+  dependsOn tasks.named('downloadTomcat')
+  from(zipTree(tomcatZip.get().asFile))
+  into(layout.buildDirectory.dir('tomcat-dist'))
+}
+
+tasks.register('deployToTomcat', Copy) {
+  group = 'application'
+  description = 'Deploys the application as the Tomcat root web application.'
+  dependsOn tasks.named('war'), tasks.named('extractTomcat')
+  from(tasks.named('war'))
+  into(tomcatHomeDir.map { it.dir('webapps') })
+  rename { 'ROOT.war' }
+
+  doFirst {
+    def webappsDir = tomcatHomeDir.get().dir('webapps').asFile
+    if (webappsDir.exists()) {
+      webappsDir.eachFile { file ->
+        file.deleteDir() || file.delete()
+      }
+    }
+  }
+}
+
+def tomcatJvmArgs = [
+  '-Djava.security.egd=file:/dev/./urandom',
+  '--add-opens=java.base/java.io=ALL-UNNAMED',
+  '--add-opens=java.base/java.lang=ALL-UNNAMED',
+  '--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED'
+]
+
+tasks.register('tomcatRun', Exec) {
+  group = 'application'
+  description = 'Runs the WAR on the downloaded Apache Tomcat distribution.'
+  dependsOn tasks.named('deployToTomcat')
+  workingDir(tomcatHomeDir.map { it.dir('bin') })
+  environment 'CATALINA_HOME', tomcatHomeDir.get().asFile.absolutePath
+  environment 'CATALINA_BASE', tomcatHomeDir.get().asFile.absolutePath
+  environment 'CATALINA_OPTS', tomcatJvmArgs.join(' ')
+
+  if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
+    commandLine 'cmd', '/c', 'catalina.bat', 'run'
+  } else {
+    commandLine './catalina.sh', 'run'
+  }
+}
