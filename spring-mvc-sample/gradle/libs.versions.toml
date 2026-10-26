@@ -3,8 +3,6 @@
 ##### plugins version #####
 # https://plugins.gradle.org/plugin/io.freefair.lombok
 lombok-plugin = "9.8.2"
-# https://plugins.gradle.org/plugin/org.gretty
-gretty = "5.1.0"
 
 
 ##### libraries versions #####
@@ -65,4 +63,3 @@ spring-test = { module = "org.springframework:spring-test", version.ref = "sprin
 #########################################################################################################
 [plugins]
 lombok = { id = "io.freefair.lombok", version.ref = "lombok-plugin" }
-gretty = { id = "org.gretty", version.ref = "gretty" }

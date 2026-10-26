@@ -20,6 +20,7 @@ words:
   - jquery
   - lantoolblog
   - logback
+  - Metaspace
   - mkdirs
   - projectlombok
   - SETLOCAL
