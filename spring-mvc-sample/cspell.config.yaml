@@ -11,6 +11,7 @@ words:
   - aspectjrt
   - codehaus
   - Dcargo
+  - Djava
   - Dskip
   - ENDLOCAL
   - findstr
@@ -18,6 +19,7 @@ words:
   - freefair
   - gradlew
   - jquery
+  - jvmargs
   - lantoolblog
   - logback
   - Metaspace
@@ -25,9 +27,11 @@ words:
   - projectlombok
   - SETLOCAL
   - ultraq
+  - urandom
   - webapps
   - webjars
   - webmvc
   - Xlint
+  - Xshare
 ignoreWords: []
 import: []
