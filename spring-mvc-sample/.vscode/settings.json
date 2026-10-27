@@ -1,9 +1,8 @@
 {
   "intellij.projects": [
     {
-      "type": "maven",
+      "type": "gradle",
       "path": "file:///$PROJECT_DIR$",
-      "java-home": "C:\\JDK\\21",
     }
   ],
   "intellij.jdkForSymbolResolution": "C:/JDK/21",
