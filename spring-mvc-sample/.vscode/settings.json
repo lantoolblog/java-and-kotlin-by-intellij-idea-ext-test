@@ -1,7 +1,7 @@
 {
   "intellij.projects": [
     {
-      "type": "gradle",
+      "type": "maven",
       "path": "file:///$PROJECT_DIR$",
     }
   ],
